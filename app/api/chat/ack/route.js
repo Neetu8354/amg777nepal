@@ -1,4 +1,4 @@
-import { getUser, listMessages, patchMessage, emit, ADMIN_CH } from "@/lib/db";
+import { getUser, listMessages, patchMessage, emitToAdmins } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +13,6 @@ export async function POST() {
       ids.push(m.id);
     }
   }
-  if (ids.length) emit(ADMIN_CH, "read", { userId: u.id, ids });
+  if (ids.length) emitToAdmins(u, "read", { userId: u.id, ids });
   return Response.json({ success: true, ids });
 }

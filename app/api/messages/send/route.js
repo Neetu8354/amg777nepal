@@ -1,4 +1,4 @@
-import { getUser, addMessage, emit, userCh, ADMIN_CH, userOnline, adminOnline, maybeAutoReply, patchMessage, schedule } from "@/lib/db";
+import { getUser, addMessage, emit, userCh, ADMIN_CH, userOnline, adminOnline, maybeAutoReply, emitToAdmins, patchMessage, schedule } from "@/lib/db";
 import { fetchPreview, firstUrl } from "@/lib/preview";
 
 export const dynamic = "force-dynamic";
@@ -13,16 +13,16 @@ export async function POST(req) {
   if (!message) return Response.json({ success: false, error: "Empty message" }, { status: 400 });
   if (message.length > 8000) return Response.json({ success: false, error: "Message too long" }, { status: 400 });
 
+  const [adm, online] = await Promise.all([adminOnline(), userOnline(u.id)]);
   const m = await addMessage(u.id, {
     sender: "user",
     username: u.username,
     message,
     reply_to: b.reply_to ?? null,
+    is_delivered: adm ? 1 : 0,
   });
-  const adm = await adminOnline();
   m.is_delivered = adm ? 1 : 0;
-  if (adm) await patchMessage(u.id, m.id, { is_delivered: 1 });
-  emit(ADMIN_CH, "message", { userId: u.id, user: pub(u, await userOnline(u.id)), message: m });
+  emitToAdmins(u, "message", { userId: u.id, user: pub(u, online), message: m });
   emit(userCh(u.id), "message", { message: m });
   if (adm) emit(userCh(u.id), "delivered", { ids: [m.id] });
 

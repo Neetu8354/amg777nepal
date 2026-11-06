@@ -1,7 +1,7 @@
 {
   "id": "/chat",
   "name": "Billy777 Customer Support App",
-  "short_name": "Billy777",
+  "short_name": "billy777",
   "description": "24x7 live support chat — message, call and get help instantly.",
   "start_url": "/chat?source=pwa",
   "scope": "/",

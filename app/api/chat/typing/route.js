@@ -1,4 +1,4 @@
-import { getUser, emit, ADMIN_CH } from "@/lib/db";
+import { getUser, emitToAdmins } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -7,6 +7,6 @@ export async function POST(req) {
   if (!u) return Response.json({ success: false }, { status: 401 });
   let b = {};
   try { b = await req.json(); } catch {}
-  emit(ADMIN_CH, "typing", { userId: u.id, username: u.username, is_typing: !!b.is_typing });
+  emitToAdmins(u, "typing", { userId: u.id, username: u.username, is_typing: !!b.is_typing });
   return Response.json({ success: true });
 }

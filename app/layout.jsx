@@ -4,12 +4,12 @@ import SwRegister from "@/components/SwRegister";
 export const metadata = {
   title: "Billy777 Customer Support",
   description: "24x7 live support chat",
-  applicationName: "Billy777 Customer Support App",
+  applicationName: "billy777",
   manifest: "/manifest.json",
   formatDetection: { telephone: false },
   appleWebApp: {
     capable: true,
-    title: "Billy777 Customer Support App",
+    title: "billy777",
     statusBarStyle: "default",
   },
   icons: {

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { findUserByMobile, createUser, newSession, sendWelcome, emit, ADMIN_CH } from "@/lib/db";
+import { findUserByMobile, createUser, newSession, sendWelcome, emitToAdmins } from "@/lib/db";
+import { otpSend } from "@/lib/authx";
 
 export const dynamic = "force-dynamic";
 
@@ -7,16 +8,23 @@ export async function POST(req) {
   let body = {};
   try { body = await req.json(); } catch {}
   const mobile = String(body.mobile || "").replace(/\D/g, "").slice(0, 10);
+  const cc = String(body.cc || "91").replace(/\D/g, "").slice(0, 4) || "91";
   if (mobile.length !== 10) {
     return Response.json({ success: false, error: "10-digit mobile daalo" }, { status: 400 });
   }
   let user = await findUserByMobile(mobile);
   const isNew = !user;
-  if (!user) user = await createUser(mobile, body.device_id);
+
+  // first-time users must verify via OTP before an account is created
+  if (isNew && !body.skip_otp) {
+    const { code, delivered } = await otpSend(`${cc}${mobile}`);
+    return Response.json({ success: true, otp_required: true, delivered, dev_code: delivered ? undefined : code, cc, mobile });
+  }
+  if (!user) user = await createUser(mobile, body.device_id, cc);
   const token = await newSession(user.id);
   if (isNew) {
     sendWelcome(user.id);
-    emit(ADMIN_CH, "user", { user });
+    emitToAdmins(user, "user", { user });
   }
   const res = NextResponse.json({
     success: true,

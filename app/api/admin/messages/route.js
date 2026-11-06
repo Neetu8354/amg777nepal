@@ -1,12 +1,14 @@
-import { isAdmin, listMessages, patchMessage, emit, userCh, userOnline, getUserById } from "@/lib/db";
+import { isAdmin, getAdmin, adminCanAccess, listMessages, patchMessage, emit, userCh, userOnline, getUserById, emitToAdmins } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req) {
-  if (!(await isAdmin())) return Response.json({ success: false }, { status: 401 });
+  const admin = await getAdmin();
+  if (!admin) return Response.json({ success: false }, { status: 401 });
   const userId = Number(new URL(req.url).searchParams.get("u"));
   const user = await getUserById(userId);
   if (!user) return Response.json({ success: false, error: "User not found" }, { status: 404 });
+  if (!adminCanAccess(admin, user)) return Response.json({ success: false, error: "Not your user" }, { status: 403 });
 
   const now = new Date().toISOString();
   const readIds = [];
@@ -17,6 +19,7 @@ export async function GET(req) {
     }
   }
   if (readIds.length) emit(userCh(userId), "read", { ids: readIds });
+  if (readIds.length) emitToAdmins(user, "read", { userId, ids: readIds });
 
   return Response.json({
     success: true,

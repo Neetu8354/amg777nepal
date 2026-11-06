@@ -1,6 +1,6 @@
 import path from "path";
 import crypto from "crypto";
-import { isAdmin, addMessage, patchMessage, emit, userCh, ADMIN_CH, userOnline } from "@/lib/db";
+import { isAdmin, getAdmin, adminCanAccess, getUserById, addMessage, emit, userCh, ADMIN_CH, userOnline, emitToAdmins, getUserById } from "@/lib/db";
 import { storeUpload } from "@/lib/media";
 
 export const dynamic = "force-dynamic";
@@ -18,6 +18,9 @@ export async function POST(req) {
   const file = fd.get("file");
   const kind = String(fd.get("kind") || "image");
   const userId = Number(fd.get("userId"));
+  const admin = await getAdmin();
+  const target = await getUserById(userId);
+  if (!admin || !adminCanAccess(admin, target)) return Response.json({ success: false, error: "Not your user" }, { status: 403 });
   const caption = String(fd.get("caption") || "").trim();
   if (!file || typeof file.arrayBuffer !== "function" || !userId) {
     return Response.json({ success: false, error: "Bad request" }, { status: 400 });
@@ -30,6 +33,7 @@ export async function POST(req) {
   const url = await storeUpload(name, Buffer.from(await file.arrayBuffer()), file.type || "application/octet-stream");
   if (!url) return Response.json({ success: false, error: "Upload failed" }, { status: 500 });
 
+  const online = await userOnline(userId);
   const m = await addMessage(userId, {
     sender: "admin",
     username: "support",
@@ -38,10 +42,10 @@ export async function POST(req) {
     video_file: kind === "video" ? url : null,
     audio_file: kind === "audio" ? url : null,
     reply_to: fd.get("reply_to") ? JSON.parse(fd.get("reply_to")) : null,
+    is_delivered: online ? 1 : 0,
   });
-  m.is_delivered = (await userOnline(userId)) ? 1 : 0;
-  if (m.is_delivered) await patchMessage(userId, m.id, { is_delivered: 1 });
+  m.is_delivered = online ? 1 : 0;
   emit(userCh(userId), "message", { message: m });
-  emit(ADMIN_CH, "message", { userId, message: m });
+  emitToAdmins(await getUserById(userId), "message", { userId, message: m });
   return Response.json({ success: true, message: m });
 }

@@ -1,4 +1,4 @@
-import { getUser, patchMessage, emit, userCh, ADMIN_CH } from "@/lib/db";
+import { getUser, patchMessage, emitToAdmins, userCh } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +12,6 @@ export async function POST(req) {
   const m = await patchMessage(u.id, id, { message, edited_at: new Date().toISOString() });
   if (!m || m.sender !== "user") return Response.json({ success: false, error: "Not found" }, { status: 404 });
   emit(userCh(u.id), "edited", { message: m });
-  emit(ADMIN_CH, "edited", { userId: u.id, message: m });
+  emitToAdmins(u, "edited", { userId: u.id, message: m });
   return Response.json({ success: true, message: m });
 }

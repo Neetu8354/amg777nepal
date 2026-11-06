@@ -1,4 +1,4 @@
-import { getUser, deleteMessage, emit, userCh, ADMIN_CH } from "@/lib/db";
+import { getUser, deleteMessage, emitToAdmins, userCh } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +11,6 @@ export async function POST(req) {
   const m = await deleteMessage(u.id, id);
   if (!m) return Response.json({ success: false, error: "Not found" }, { status: 404 });
   emit(userCh(u.id), "deleted", { id });
-  emit(ADMIN_CH, "deleted", { userId: u.id, id });
+  emitToAdmins(u, "deleted", { userId: u.id, id });
   return Response.json({ success: true });
 }

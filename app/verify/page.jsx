@@ -32,6 +32,7 @@ const CSS = `
           background: #0c0c0c; border: 1px solid rgba(234,75,28,0.6); transition: border-color .2s, box-shadow .2s;
         }
         .v-field:focus-within { border-color: #ff6b4a; box-shadow: 0 0 0 3px rgba(229,179,80,0.15); }
+        .v-sel { border: none; outline: none; cursor: pointer; font-family: inherit; }
         .v-cc { flex-shrink: 0; background: #1e1e1e; color: #ff6b4a; font-weight: 700; font-size: 14px; padding: 7px 9px; border-radius: 8px; }
         .v-input {
           flex: 1; min-width: 0; width: 100%; padding: 8px 0; font-size: 16px; border: 0; outline: none; text-align: left;
@@ -86,6 +87,8 @@ export default function VerifyPage() {
   const [mobile, setMobile] = useState("");
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
+  const [otpMode, setOtpMode] = useState("wa"); // "wa" | "signup"
+  const [cc, setCc] = useState("91");
   const [resendIn, setResendIn] = useState(0);
   const [wait, setWait] = useState(null); // whatsapp wait card {code, link}
   const [info, setInfo] = useState("");
@@ -124,6 +127,7 @@ export default function VerifyPage() {
     setLoading(true);
     setErr("");
     try {
+      setOtpMode("wa");
       const r = await api("/api/auth/wa/otp/send", { method: "POST", body: { mobile } });
       if (r.data?.success) {
         setOtpSent(true);
@@ -141,7 +145,7 @@ export default function VerifyPage() {
     setLoading(true);
     setErr("");
     try {
-      const r = await api("/api/auth/wa/otp/verify", { method: "POST", body: { mobile, otp } });
+      const r = await api(otpMode === "signup" ? "/api/verify-otp" : "/api/auth/wa/otp/verify", { method: "POST", body: { mobile, cc, otp } });
       if (r.data?.success) window.location.replace(r.data.redirect || "/chat");
       else setErr(r.data?.error || "Code galat hai");
     } catch {
@@ -176,10 +180,18 @@ export default function VerifyPage() {
     setErr("");
     setInfo("");
     try {
-      const body = { mobile, device_id: deviceId() };
+      const body = { mobile, cc, device_id: deviceId() };
       if (withPw || needPw) body.password = pw;
       const r = await api("/api/verify-mobile", { method: "POST", body });
       const d = r.data;
+      if (d?.success && d.otp_required) {
+        setOtpMode("signup");
+        setOtpSent(true);
+        setResendIn(30);
+        setInfo(`OTP bheja gaya +${cc} ${mobile} pe${d.dev_code ? ` — demo code: ${d.dev_code}` : ""}`);
+        setLoading(false);
+        return;
+      }
       if (d?.success) {
         window.location.replace(d.redirect || "/chat");
         return;
@@ -234,7 +246,11 @@ export default function VerifyPage() {
           ) : (
             <>
               <label className="v-field">
-                <span className="v-cc">+91</span>
+                <select className="v-cc v-sel" value={cc} onChange={(e) => setCc(e.target.value)} disabled={needPw || otpSent}>
+                  <option value="91">+91 🇮🇳</option>
+                  <option value="92">+92 🇵🇰</option>
+                  <option value="977">+977 🇳🇵</option>
+                </select>
                 <input
                   className="v-input"
                   type="tel"
@@ -302,21 +318,20 @@ export default function VerifyPage() {
               )}
               {info && !err && <div className="v-msg info">{info}</div>}
               {err && <div className="v-msg err">{err}</div>}
-              {cfg.waOtp && !needPw && (
-                otpSent ? (
-                  <>
-                    <button className="v-btn" onClick={verifyOtp} disabled={loading}>
-                      {loading ? "Please wait..." : "Verify code"}
-                    </button>
-                    <button className="v-link" onClick={sendOtp} disabled={resendIn > 0 || loading}>
-                      {resendIn > 0 ? `Resend in ${resendIn}s` : "Resend code"}
-                    </button>
-                  </>
-                ) : (
-                  <button className="v-btn" onClick={sendOtp} disabled={loading}>
-                    <i className="fab fa-whatsapp" /> {loading ? "Please wait..." : "Login with OTP"}
+              {otpSent && !needPw && (
+                <>
+                  <button className="v-btn" onClick={verifyOtp} disabled={loading}>
+                    {loading ? "Please wait..." : "Verify code"}
                   </button>
-                )
+                  <button className="v-link" onClick={() => { setOtpSent(false); setOtp(""); }} disabled={loading}>
+                    Change number
+                  </button>
+                </>
+              )}
+              {cfg.waOtp && !needPw && !otpSent && (
+                <button className="v-btn" onClick={sendOtp} disabled={loading}>
+                  <i className="fab fa-whatsapp" /> {loading ? "Please wait..." : "Login with OTP"}
+                </button>
               )}
               {cfg.plain && !otpSent && (
                 needPw ? (

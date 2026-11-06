@@ -1,6 +1,6 @@
 import path from "path";
 import crypto from "crypto";
-import { getUser, addMessage, emit, userCh, ADMIN_CH, userOnline, adminOnline, maybeAutoReply } from "@/lib/db";
+import { getUser, addMessage, emit, userCh, ADMIN_CH, userOnline, adminOnline, maybeAutoReply, emitToAdmins } from "@/lib/db";
 import { storeUpload } from "@/lib/media";
 
 export const dynamic = "force-dynamic";
@@ -31,6 +31,7 @@ export async function POST(req) {
   const url = await storeUpload(name, Buffer.from(await file.arrayBuffer()), file.type || "application/octet-stream");
   if (!url) return Response.json({ success: false, error: "Upload failed" }, { status: 500 });
 
+  const [adm, online] = await Promise.all([adminOnline(), userOnline(u.id)]);
   const m = await addMessage(u.id, {
     sender: "user",
     username: u.username,
@@ -39,11 +40,10 @@ export async function POST(req) {
     video_file: kind === "video" ? url : null,
     audio_file: kind === "audio" ? url : null,
     reply_to: fd.get("reply_to") ? JSON.parse(fd.get("reply_to")) : null,
+    is_delivered: adm ? 1 : 0,
   });
-  const adm = await adminOnline();
   m.is_delivered = adm ? 1 : 0;
-  const online = await userOnline(u.id);
-  emit(ADMIN_CH, "message", { userId: u.id, user: { id: u.id, mobile: u.mobile, username: u.username, display_name: u.display_name, online }, message: m });
+  emitToAdmins(u, "message", { userId: u.id, user: { id: u.id, mobile: u.mobile, username: u.username, display_name: u.display_name, online }, message: m });
   emit(userCh(u.id), "message", { message: m });
   if (adm) emit(userCh(u.id), "delivered", { ids: [m.id] });
   maybeAutoReply(u.id);

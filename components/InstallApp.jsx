@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
-const APP_NAME = "Billy777 Customer Support App";
+const APP_NAME = "billy777";
 const ICON = "/app/icon-192.png?v=2";
 
 const IA_CSS = `

@@ -1,11 +1,13 @@
-import { isAdmin, db, allMessages, onlineUserIds } from "@/lib/db";
+import { isAdmin, getAdmin, db, allMessages, onlineUserIds } from "@/lib/db";
 import { remote, remoteOn } from "@/lib/remote";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  if (!(await isAdmin())) return Response.json({ success: false }, { status: 401 });
-  const users = remoteOn ? await remote.usersAll() : Object.values(db.users);
+  const admin = await getAdmin();
+  if (!admin) return Response.json({ success: false }, { status: 401 });
+  let users = remoteOn ? await remote.usersAll() : Object.values(db.users);
+  if (!admin.main) users = users.filter((u) => u.agent_id === admin.agent?.id);
   const msgs = await allMessages();
   const online = await onlineUserIds();
   const byUser = new Map();

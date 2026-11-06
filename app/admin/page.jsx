@@ -33,6 +33,23 @@ html, body { height:100%; overscroll-behavior:none; }
 .a-side-head img { height:30px; width:auto; border-radius:8px; }
 .a-side-head strong { flex:1; font-size:15px; }
 .a-side-head button { background:rgba(255,255,255,.15); color:#fff; border:0; border-radius:16px; padding:6px 10px; font-size:12px; cursor:pointer; }
+.ag-overlay { position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:300; display:flex; align-items:center; justify-content:center; padding:16px; }
+.ag-panel { background:#fff; border-radius:14px; width:100%; max-width:400px; max-height:85vh; overflow:auto; }
+.ag-head { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid #eee; }
+.ag-head button { border:0; background:none; font-size:16px; cursor:pointer; color:#666; }
+.ag-form { padding:12px 14px; border-bottom:1px solid #eee; display:flex; flex-direction:column; gap:8px; }
+.ag-form input { padding:9px 11px; border:1px solid #ddd; border-radius:8px; font-size:14px; }
+.ag-def { font-size:13px; color:#555; display:flex; gap:6px; align-items:center; }
+.ag-add { padding:10px; border:0; border-radius:8px; background:#e13c0e; color:#fff; font-weight:700; cursor:pointer; }
+.ag-list { padding:8px 14px 14px; }
+.ag-row { display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid #f0f0f0; }
+.ag-info { flex:1; font-size:13.5px; }
+.ag-u { color:#888; font-size:12px; margin-left:4px; }
+.ag-p { display:block; color:#c23a10; font-size:11.5px; }
+.ag-tgl { border:0; border-radius:12px; padding:4px 10px; font-size:11px; cursor:pointer; background:#eee; color:#777; }
+.ag-tgl.on { background:#dff3e3; color:#1a7f37; }
+.ag-del { border:0; background:none; color:#c00; cursor:pointer; }
+.ag-none { text-align:center; color:#999; font-size:13px; padding:16px; }
 .a-search { padding:8px; border-bottom:1px solid #eee; }
 .a-search input { width:100%; padding:8px 12px; border-radius:18px; border:1px solid #ddd; outline:none; font-size:13px; }
 .a-list { flex:1; overflow-y:auto; }
@@ -228,9 +245,58 @@ function Login({ onOk }) {
   );
 }
 
+function AgentsPanel({ onClose }) {
+  const [list, setList] = useState([]);
+  const [f, setF] = useState({ username: "", password: "", name: "", prefixes: "", is_default: false });
+  const [err, setErr] = useState("");
+  const load = useCallback(async () => {
+    const r = await api("/api/admin/agents", { cache: "no-store" });
+    if (r.data?.success) setList(r.data.agents);
+  }, []);
+  useEffect(() => { load(); }, [load]);
+  const create = async () => {
+    setErr("");
+    const r = await api("/api/admin/agents", { method: "POST", body: f });
+    if (r.data?.success) { setF({ username: "", password: "", name: "", prefixes: "", is_default: false }); load(); }
+    else setErr(r.data?.error || "Failed");
+  };
+  const act = async (body) => { await api("/api/admin/agents", { method: "POST", body }); load(); };
+  return (
+    <div className="ag-overlay" onClick={onClose}>
+      <div className="ag-panel" onClick={(e) => e.stopPropagation()}>
+        <div className="ag-head"><strong>Agents</strong><button onClick={onClose}><i className="fas fa-times" /></button></div>
+        <div className="ag-form">
+          <input placeholder="Name (e.g. PK Agent)" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
+          <input placeholder="Username" value={f.username} onChange={(e) => setF({ ...f, username: e.target.value })} />
+          <input placeholder="Password" value={f.password} onChange={(e) => setF({ ...f, password: e.target.value })} />
+          <input placeholder="Country codes e.g. 92,977" value={f.prefixes} onChange={(e) => setF({ ...f, prefixes: e.target.value })} />
+          <label className="ag-def"><input type="checkbox" checked={f.is_default} onChange={(e) => setF({ ...f, is_default: e.target.checked })} /> Default (catch-all)</label>
+          {err && <div className="a-err">{err}</div>}
+          <button className="ag-add" onClick={create}>Add agent</button>
+        </div>
+        <div className="ag-list">
+          {list.map((a) => (
+            <div key={a.id} className="ag-row">
+              <div className="ag-info">
+                <b>{a.name}</b> <span className="ag-u">@{a.username}</span>
+                <span className="ag-p">+{(a.prefixes || []).join(", +") || "—"}{a.is_default ? " · default" : ""}</span>
+              </div>
+              <button className={`ag-tgl ${a.active ? "on" : ""}`} onClick={() => act({ action: "update", id: a.id, active: !a.active })}>{a.active ? "Active" : "Off"}</button>
+              <button className="ag-del" onClick={() => act({ action: "delete", id: a.id })}><i className="fas fa-trash" /></button>
+            </div>
+          ))}
+          {!list.length && <div className="ag-none">No agents yet</div>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Console() {
   const [users, setUsers] = useState([]);
   const [sel, setSel] = useState(null);
+  const [role, setRole] = useState(null);
+  const [agentsOpen, setAgentsOpen] = useState(false);
   const [msgsMap, setMsgsMap] = useState({}); // userId -> [msg]
   const [typingMap, setTypingMap] = useState({});
   const [onlineMap, setOnlineMap] = useState({});
@@ -288,6 +354,7 @@ function Console() {
 
   useEffect(() => {
     refreshUsers();
+    api("/api/admin/me").then((r) => setRole(r.data?.role || null));
     const es = new EventSource("/api/admin/events");
     es.addEventListener("message", (e) => {
       try {
@@ -561,6 +628,7 @@ function Console() {
       <div className="a-root">
         <aside className={`a-side ${mobileOpen ? "hidden" : ""}`}>
           <div className="a-side-head">
+            {role === "main" && <button onClick={() => setAgentsOpen(true)} title="Agents"><i className="fas fa-users-gear" /></button>}
             <img src="/app/billy-logo.png" alt="" />
             <strong>Billy777 Admin</strong>
             <button onClick={refreshUsers} title="Refresh"><i className="fas fa-rotate" /></button>
@@ -735,6 +803,7 @@ function Console() {
 .wa-sheet button:active{background:#f0f0f0}
 .wa-sheet button.cancel{color:#e74c3c;font-weight:600;border-top:1px solid #eee;margin-top:4px;justify-content:center}
 .wa-sheet button i{width:20px;text-align:center;font-size:15px;color:#666}`}</style>
+      {agentsOpen && <AgentsPanel onClose={() => setAgentsOpen(false)} />}
       {toast && <div key={toast.id} className={`wa-toast ${toast.kind}`}>{toast.msg}</div>}
 
       <CallOverlay
