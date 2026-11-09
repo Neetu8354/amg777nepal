@@ -1,6 +1,6 @@
 import path from "path";
 import crypto from "crypto";
-import { getUser, addMessage, emit, userCh, ADMIN_CH, userOnline, adminOnline, maybeAutoReply, emitToAdmins } from "@/lib/db";
+import { getUser, userIsBlocked, addMessage, emit, userCh, ADMIN_CH, userOnline, adminOnline, maybeAutoReply, emitToAdmins } from "@/lib/db";
 import { storeUpload } from "@/lib/media";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +15,7 @@ const EXT = {
 export async function POST(req) {
   const u = await getUser();
   if (!u) return Response.json({ success: false, error: "unauthorized" }, { status: 401 });
-  if (u.blocked) return Response.json({ success: false, error: "You are blocked." }, { status: 403 });
+  if (await userIsBlocked(u)) return Response.json({ success: false, error: "You are blocked." }, { status: 403 });
   const fd = await req.formData();
   const file = fd.get("file");
   const kind = String(fd.get("kind") || "image");

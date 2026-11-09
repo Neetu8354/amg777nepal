@@ -1,4 +1,4 @@
-import { isAdmin, getAdmin, adminCanAccess, deleteMessage, emitToAdmins, userCh, getUserById } from "@/lib/db";
+import { isAdmin, getAdmin, adminCanAccess, deleteMessage, emit, emitToAdmins, userCh, getUserById } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 

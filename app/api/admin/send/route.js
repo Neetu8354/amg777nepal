@@ -27,7 +27,10 @@ export async function POST(req) {
   m.is_delivered = online ? 1 : 0;
   emit(userCh(userId), "message", { message: m });
   emitToAdmins(await getUserById(userId), "message", { userId, message: m });
-  if (m.is_delivered) emit(ADMIN_CH, "delivered", { userId, ids: [m.id] });
+  if (m.is_delivered) {
+    emit(userCh(userId), "delivered", { ids: [m.id] });
+    emit(ADMIN_CH, "delivered", { userId, ids: [m.id] });
+  }
   pushToUser(userId, { title: SUPPORT.display_name, body: message });
   return Response.json({ success: true, message: m });
 }

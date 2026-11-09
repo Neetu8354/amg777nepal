@@ -1,4 +1,4 @@
-import { getUser, addMessage, emit, userCh, ADMIN_CH, userOnline, adminOnline, maybeAutoReply, emitToAdmins, patchMessage, schedule } from "@/lib/db";
+import { getUser, userIsBlocked, addMessage, emit, userCh, ADMIN_CH, userOnline, adminOnline, maybeAutoReply, emitToAdmins, patchMessage, schedule } from "@/lib/db";
 import { fetchPreview, firstUrl } from "@/lib/preview";
 
 export const dynamic = "force-dynamic";
@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export async function POST(req) {
   const u = await getUser();
   if (!u) return Response.json({ success: false, error: "unauthorized" }, { status: 401 });
-  if (u.blocked) return Response.json({ success: false, error: "You are blocked." }, { status: 403 });
+  if (await userIsBlocked(u)) return Response.json({ success: false, error: "You are blocked." }, { status: 403 });
   let b = {};
   try { b = await req.json(); } catch {}
   const message = String(b.message || "").trim();

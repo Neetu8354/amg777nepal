@@ -1,6 +1,6 @@
 import path from "path";
 import crypto from "crypto";
-import { isAdmin, getAdmin, adminCanAccess, getUserById, addMessage, emit, userCh, ADMIN_CH, userOnline, emitToAdmins, getUserById } from "@/lib/db";
+import { isAdmin, getAdmin, adminCanAccess, getUserById, addMessage, emit, userCh, ADMIN_CH, userOnline, emitToAdmins } from "@/lib/db";
 import { storeUpload } from "@/lib/media";
 
 export const dynamic = "force-dynamic";
@@ -47,5 +47,9 @@ export async function POST(req) {
   m.is_delivered = online ? 1 : 0;
   emit(userCh(userId), "message", { message: m });
   emitToAdmins(await getUserById(userId), "message", { userId, message: m });
+  if (m.is_delivered) {
+    emit(userCh(userId), "delivered", { ids: [m.id] });
+    emit(ADMIN_CH, "delivered", { userId, ids: [m.id] });
+  }
   return Response.json({ success: true, message: m });
 }

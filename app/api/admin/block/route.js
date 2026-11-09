@@ -1,4 +1,4 @@
-import { isAdmin, getAdmin, adminCanAccess, getUserById, emitToAdmins, userCh } from "@/lib/db";
+import { isAdmin, getAdmin, adminCanAccess, getUserById, emit, emitToAdmins, userCh, invalidateUserSessions } from "@/lib/db";
 import { remote, remoteOn } from "@/lib/remote";
 
 export const dynamic = "force-dynamic";
@@ -13,8 +13,9 @@ export async function POST(req) {
   const admin = await getAdmin();
   if (!adminCanAccess(admin, u)) return Response.json({ success: false, error: "Not your user" }, { status: 403 });
   u.blocked = !!b.blocked;
-  if (remoteOn) remote.patchUser(userId, { blocked: u.blocked });
+  if (remoteOn) await remote.patchUser(userId, { blocked: u.blocked });
   else { const { db, save } = await import("@/lib/db"); db.users[userId] = u; save(); }
+  invalidateUserSessions(userId);
   emit(userCh(userId), "blocked", { blocked: u.blocked });
   emitToAdmins(u, "blocked", { userId, blocked: u.blocked });
   return Response.json({ success: true });
