@@ -55,6 +55,10 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   const req = event.request;
+  // file downloads must hit the network directly — a SW-served download loses its filename (saves as a GUID)
+  try {
+    if (/\.apk$/i.test(new URL(req.url).pathname)) return;
+  } catch {}
   if (req.mode === "navigate") {
     event.respondWith((async () => {
       try {
