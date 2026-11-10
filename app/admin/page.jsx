@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CALL_CSS, CallOverlay, useVoiceCall } from "@/components/CallUI";
 import { Tick, MsgText, StickerMsg, VoicePlayer, CallEventRow, EmojiGrid, StickerPicker } from "@/components/ChatBits";
-import { api, fmtTime, fmtDay, fmtAgo, sfx, isSticker, callInfo, avatarFor } from "@/lib/client";
+import { api, fmtTime, fmtDay, fmtAgo, sfx, isSticker, callInfo, avatarFor, subscribePush } from "@/lib/client";
 
 const CSS = `
 * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; -webkit-tap-highlight-color:transparent; }
@@ -324,11 +324,27 @@ function Console() {
 
   const call = useVoiceCall({ actor: "admin", endpoint: "/api/admin/call" });
 
+  const [notifOn, setNotifOn] = useState(false);
+
   const showToast = useCallback((msg, kind = "") => {
     setToast({ msg, kind, id: Date.now() });
     clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToast(null), 3000);
   }, []);
+
+  const enableNotifs = useCallback(async () => {
+    try {
+      if (typeof Notification === "undefined") return showToast("Notifications not supported in this browser");
+      let p = Notification.permission;
+      if (p === "default") p = await Notification.requestPermission();
+      if (p !== "granted") { setNotifOn(false); return showToast("Notifications blocked — allow them in site settings"); }
+      await subscribePush();
+      setNotifOn(true);
+      showToast("Call alerts on — you'll be notified even with this tab closed", "success");
+    } catch (e) {
+      showToast(e?.message || "Could not enable notifications");
+    }
+  }, [showToast]);
 
   const refreshUsers = useCallback(async () => {
     const r = await api("/api/admin/users", { cache: "no-store" });
@@ -355,6 +371,10 @@ function Console() {
   useEffect(() => {
     refreshUsers();
     api("/api/admin/me").then((r) => setRole(r.data?.role || null));
+    // silently re-subscribe if permission was granted before; else bell enables it
+    if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+      subscribePush().then((ok) => setNotifOn(!!ok)).catch(() => {});
+    }
     const es = new EventSource("/api/admin/events");
     es.addEventListener("message", (e) => {
       try {
@@ -631,6 +651,9 @@ function Console() {
             {role === "main" && <button onClick={() => setAgentsOpen(true)} title="Agents"><i className="fas fa-users-gear" /></button>}
             <img src="/app/billy-logo.png" alt="" />
             <strong>Billy777 Admin</strong>
+            <button onClick={enableNotifs} title={notifOn ? "Call alerts on" : "Enable call alerts"} style={notifOn ? { color: "#25d366" } : undefined}>
+              <i className={`fas ${notifOn ? "fa-bell" : "fa-bell-slash"}`} />
+            </button>
             <button onClick={refreshUsers} title="Refresh"><i className="fas fa-rotate" /></button>
             <button onClick={logout}>Logout</button>
           </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api, avatarFor, fmtDur, ringtoneStart, ringtoneStop, outRingStart, outRingStop } from "@/lib/client";
+import { api, avatarFor, fmtDur, ringtoneStart, ringtoneStop, outRingStart, outRingStop, osNotify } from "@/lib/client";
 
 export const CALL_CSS = `
 .call-ev { display:flex; align-items:center; gap:10px; background:#fff; border-radius:12px; padding:8px 12px; min-width:170px; max-width:280px; box-shadow:0 1px 1px rgba(0,0,0,.08); }
@@ -275,6 +275,7 @@ export function useVoiceCall({ actor, endpoint, onPeer }) {
             peerUserId: p.userId,
           });
           ringtoneStart();
+          osNotify("📞 Incoming call", `${p.fromName || p.display_name || p.mobile || "Support"} is calling`, `call-${p.callId}`);
           onPeer?.(p);
           break;
         }

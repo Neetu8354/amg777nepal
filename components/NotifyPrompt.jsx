@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { api } from "@/lib/client";
+import { subscribePush } from "@/lib/client";
 
 const NG_CSS = `
 .ng-back { position:fixed; inset:0; z-index:40000; background:rgba(70,70,70,.55); display:flex; align-items:center; justify-content:center;
@@ -32,27 +32,6 @@ const NG_CSS = `
 .ng-btn.ghost { background:#fff0eb; color:#c23a10; margin-top:8px; }
 .ng-fine { margin:10px 0 0; font-size:12px; color:#8696a0; line-height:1.4; word-break:break-word; }
 `;
-
-function urlB64ToUint8Array(base64String) {
-  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
-  const raw = atob(base64);
-  return Uint8Array.from([...raw].map((c) => c.charCodeAt(0)));
-}
-
-async function subscribePush() {
-  if (!("serviceWorker" in navigator) || !("PushManager" in window)) return false;
-  const reg = await navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" });
-  await navigator.serviceWorker.ready;
-  const k = await (await fetch("/api/push/key", { cache: "no-store" })).json();
-  if (!k?.key) throw new Error("Push is not configured on this server");
-  const sub = await reg.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: urlB64ToUint8Array(k.key),
-  });
-  await api("/api/push/subscribe", { method: "POST", body: sub.toJSON() });
-  return true;
-}
 
 function permState() {
   if (typeof Notification === "undefined") return "unsupported";

@@ -125,15 +125,15 @@ self.addEventListener("push", (event) => {
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
   const path = (event.notification.data && event.notification.data.url) || "/chat";
-  const url = new URL(path, self.location.origin).href;
+  const url = new URL(path, self.location.origin);
   event.waitUntil((async () => {
     const list = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
     for (const client of list) {
-      if (new URL(client.url).pathname.startsWith("/chat") && "focus" in client) {
+      if (new URL(client.url).pathname.startsWith(url.pathname) && "focus" in client) {
         await client.focus();
         return;
       }
     }
-    if (self.clients.openWindow) await self.clients.openWindow(url);
+    if (self.clients.openWindow) await self.clients.openWindow(url.href);
   })());
 });
