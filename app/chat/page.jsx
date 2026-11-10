@@ -7,7 +7,7 @@ import VisitBeacon from "@/components/VisitBeacon";
 import { CALL_CSS, CallOverlay, useVoiceCall } from "@/components/CallUI";
 import {
   Tick, MsgText, StickerMsg, VoicePlayer, CallEventRow,
-  EmojiGrid, StickerPicker, MediaComposer, Sheet,
+  EmojiGrid, StickerPicker, MediaComposer, Sheet, ImageViewer,
 } from "@/components/ChatBits";
 import {
   api, fmtTime, fmtDay, fmtAgo, sfx, isSticker, callInfo, avatarFor,
@@ -597,7 +597,7 @@ export default function ChatPage() {
                 {plain ? <span className={`wa-meta-gap ${mine ? "mine" : ""} ${m.edited_at ? "edited" : ""}`} /> : null}
               </>
             ) : null}
-            {m.image ? <img className="wa-img" src={m.image} alt="" onClick={(e) => { e.stopPropagation(); setViewer(m.image); }} /> : null}
+            {m.image ? <img className="wa-img" src={m.image} alt="" onClick={(e) => { e.stopPropagation(); setViewer({ src: m.image, caption: m.message }); }} /> : null}
             {m.video_file ? <video className="wa-vid" controls preload="metadata" playsInline src={m.video_file} /> : null}
             {m.audio_file ? <VoicePlayer src={m.audio_file} /> : null}
             <div className="wa-meta">
@@ -789,6 +789,7 @@ export default function ChatPage() {
           />
         )}
 
+        {viewer && <ImageViewer src={viewer.src} caption={viewer.caption} onClose={() => setViewer(null)} />}
         {menuFor && <Sheet items={msgActions} onClose={() => setMenuFor(null)} />}
         {toast && <div key={toast.id} className={`wa-toast ${toast.kind}`}>{toast.msg}</div>}
 

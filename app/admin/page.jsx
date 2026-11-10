@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CALL_CSS, CallOverlay, useVoiceCall } from "@/components/CallUI";
-import { Tick, MsgText, StickerMsg, VoicePlayer, CallEventRow, EmojiGrid, StickerPicker } from "@/components/ChatBits";
+import { Tick, MsgText, StickerMsg, VoicePlayer, CallEventRow, EmojiGrid, StickerPicker, ImageViewer } from "@/components/ChatBits";
 import { api, fmtTime, fmtDay, fmtAgo, sfx, isSticker, callInfo, avatarFor, subscribePush } from "@/lib/client";
 
 const CSS = `
@@ -72,7 +72,7 @@ html, body { height:100%; overscroll-behavior:none; }
 .a-main { flex:1; display:flex; flex-direction:column; min-width:0; }
 .a-conv-head { background:#c23a10; color:#fff; padding:8px 12px; display:flex; align-items:center; gap:10px; min-height:56px; }
 .a-conv-head img { width:38px; height:38px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,.35); }
-.a-back2 { display:none; background:none; border:0; color:#fff; font-size:17px; cursor:pointer; padding:4px 8px; }
+.a-back2 { display:flex; align-items:center; justify-content:center; background:none; border:0; color:#fff; font-size:17px; cursor:pointer; padding:4px 8px; flex-shrink:0; }
 .a-ch-title { flex:1; min-width:0; }
 .a-ch-name { font-size:14.5px; font-weight:600; }
 .a-ch-sub { font-size:11px; color:rgba(255,255,255,.8); }
@@ -384,7 +384,7 @@ function Console() {
             const ex = us.find((u) => u.id === userId);
             const base = ex || { id: userId, ...user, unread: 0 };
             const next = { ...base, last_message: message, unread: message.sender === "user" && selRef.current !== userId ? (base.unread || 0) + 1 : base.unread || 0 };
-            return ex ? us.map((u) => (u.id === userId ? next : u)) : [next, ...us];
+            return [next, ...us.filter((u) => u.id !== userId)]; // bump active chat to top
           });
         }
         setMsgsMap((m) => {
@@ -610,7 +610,7 @@ function Console() {
                 {plain ? <span className={`wa-meta-gap ${mine ? "mine" : ""} ${m.edited_at ? "edited" : ""}`} /> : null}
               </>
             ) : null}
-            {m.image ? <img className="wa-img" src={m.image} alt="" onClick={(e) => { e.stopPropagation(); setViewer(m.image); }} /> : null}
+            {m.image ? <img className="wa-img" src={m.image} alt="" onClick={(e) => { e.stopPropagation(); setViewer({ src: m.image, caption: m.message }); }} /> : null}
             {m.video_file ? <video className="wa-vid" controls preload="metadata" playsInline src={m.video_file} /> : null}
             {m.audio_file ? <VoicePlayer src={m.audio_file} /> : null}
             <div className="wa-meta">
@@ -695,7 +695,7 @@ function Console() {
           ) : (
             <div className="chat-root">
               <header className="wa-header">
-                <button className="a-back2" onClick={() => setMobileOpen(false)} aria-label="Back">
+                <button className="a-back2" onClick={() => { setMobileOpen(false); setSel(null); }} aria-label="Back to customers" title="Back to customers">
                   <i className="fas fa-arrow-left" />
                 </button>
                 <div className="wa-avatar-wrap">
@@ -744,13 +744,7 @@ function Console() {
                   </div>
                 )}
                 {rows}
-                    {viewer && (
-        <div className="wa-viewer" onClick={() => setViewer(null)}>
-          <button className="wa-vx" onClick={() => setViewer(null)}><i className="fas fa-times" /></button>
-          <img src={viewer} alt="" onClick={(e) => e.stopPropagation()} />
-        </div>
-      )}
-</main>
+              </main>
 
               {replyTo && (
                 <div className="wa-context-bar">
@@ -826,6 +820,7 @@ function Console() {
 .wa-sheet button:active{background:#f0f0f0}
 .wa-sheet button.cancel{color:#e74c3c;font-weight:600;border-top:1px solid #eee;margin-top:4px;justify-content:center}
 .wa-sheet button i{width:20px;text-align:center;font-size:15px;color:#666}`}</style>
+      {viewer && <ImageViewer src={viewer.src} caption={viewer.caption} onClose={() => setViewer(null)} />}
       {agentsOpen && <AgentsPanel onClose={() => setAgentsOpen(false)} />}
       {toast && <div key={toast.id} className={`wa-toast ${toast.kind}`}>{toast.msg}</div>}
 

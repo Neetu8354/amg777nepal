@@ -284,3 +284,50 @@ export function Sheet({ items, onClose }) {
     </div>
   );
 }
+
+/* ---------- image preview popup ---------- */
+const IV_CSS = `
+.iv-back { position:fixed; inset:0; z-index:100500; background:rgba(8,12,16,.78); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+  display:flex; align-items:center; justify-content:center; padding:14px; animation:ivFade .15s ease-out; }
+.iv-card { position:relative; background:#111b21; border-radius:16px; width:auto; max-width:min(94vw,920px); max-height:88vh;
+  display:flex; flex-direction:column; overflow:hidden; box-shadow:0 24px 70px rgba(0,0,0,.55); animation:ivPop .18s cubic-bezier(.2,.9,.3,1.1); }
+.iv-card img { max-width:min(94vw,920px); max-height:calc(88vh - 54px); width:auto; height:auto; object-fit:contain; display:block; background:#0b141a; }
+.iv-x { position:absolute; top:10px; right:10px; width:38px; height:38px; border-radius:50%; border:0;
+  background:rgba(0,0,0,.55); color:#fff; font-size:16px; cursor:pointer; z-index:2; display:flex; align-items:center; justify-content:center; }
+.iv-x:hover { background:rgba(0,0,0,.85); }
+.iv-open { position:absolute; top:10px; right:56px; width:38px; height:38px; border-radius:50%;
+  background:rgba(0,0,0,.55); color:#fff; font-size:14px; display:flex; align-items:center; justify-content:center; text-decoration:none; z-index:2; }
+.iv-open:hover { background:rgba(0,0,0,.85); }
+.iv-cap { color:#e9edef; font-size:13.5px; padding:10px 16px; max-height:54px; overflow:auto; line-height:1.4; word-break:break-word; flex-shrink:0; }
+@keyframes ivFade { from { opacity:0 } to { opacity:1 } }
+@keyframes ivPop { from { opacity:0; transform:scale(.94) } to { opacity:1; transform:none } }
+`;
+
+export function ImageViewer({ src, caption, onClose }) {
+  useEffect(() => {
+    const f = (e) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", f);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", f);
+      document.body.style.overflow = prev;
+    };
+  }, [onClose]);
+  if (!src) return null;
+  return (
+    <>
+      <style>{IV_CSS}</style>
+      <div className="iv-back" onClick={onClose} role="dialog" aria-modal="true" aria-label="Image preview">
+        <div className="iv-card" onClick={(e) => e.stopPropagation()}>
+          <button className="iv-x" onClick={onClose} aria-label="Close"><i className="fas fa-times" /></button>
+          <a className="iv-open" href={src} target="_blank" rel="noreferrer" title="Open original" aria-label="Open original">
+            <i className="fas fa-up-right-from-square" />
+          </a>
+          <img src={src} alt={caption || "image"} />
+          {caption ? <div className="iv-cap">{caption}</div> : null}
+        </div>
+      </div>
+    </>
+  );
+}
