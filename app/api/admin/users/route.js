@@ -6,19 +6,31 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const admin = await getAdmin();
   if (!admin) return Response.json({ success: false }, { status: 401 });
-  let users = remoteOn ? await remote.usersAll() : Object.values(db.users);
-  if (!admin.main) users = users.filter((u) => u.agent_id === admin.agent?.id);
-  const msgs = await allMessages();
-  const online = await onlineUserIds();
+
+  const [usersAll, stats, online] = await Promise.all([
+    remoteOn ? remote.usersAll() : Promise.resolve(Object.values(db.users)),
+    remoteOn ? remote.userStats() : Promise.resolve(null),
+    onlineUserIds(),
+  ]);
+  // only pay the full-table cost when the sg_user_stats rpc isn't installed
+  const msgs = stats ? null : await allMessages();
+
+  // fallback when the sg_user_stats rpc isn't installed yet
   const byUser = new Map();
-  for (const m of msgs) {
-    const uid = m.user_id;
-    if (!byUser.has(uid)) byUser.set(uid, []);
-    byUser.get(uid).push(m);
+  if (!stats) {
+    for (const m of msgs || []) {
+      const uid = m.user_id;
+      if (!byUser.has(uid)) byUser.set(uid, []);
+      byUser.get(uid).push(m);
+    }
   }
+
+  let users = usersAll;
+  if (!admin.main) users = users.filter((u) => u.agent_id === admin.agent?.id);
   const out = users
     .map((u) => {
-      const list = byUser.get(u.id) || [];
+      const st = stats?.get(u.id);
+      const list = st ? null : byUser.get(u.id) || [];
       return {
         id: u.id,
         mobile: u.mobile,
@@ -28,8 +40,8 @@ export async function GET() {
         online: online.has(u.id),
         last_seen: u.last_seen,
         created_at: u.created_at,
-        unread: list.filter((m) => m.sender === "user" && !m.read_at).length,
-        last_message: list[list.length - 1] || null,
+        unread: st ? st.unread : list.filter((m) => m.sender === "user" && !m.read_at).length,
+        last_message: st ? st.last : list[list.length - 1] || null,
       };
     })
     .sort((a, b) => {
