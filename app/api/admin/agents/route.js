@@ -17,7 +17,11 @@ export async function POST(req) {
   if (!(await mainOnly())) return Response.json({ success: false }, { status: 401 });
   let b = {};
   try { b = await req.json(); } catch {}
-  if (b.action === "delete") return Response.json(await deleteAgent(Number(b.id)));
+  if (b.action === "delete") {
+    const r = await deleteAgent(Number(b.id));
+    if (r.error) return Response.json({ success: false, error: r.error }, { status: 400 });
+    return Response.json(r);
+  }
   if (b.action === "update") return Response.json(await updateAgent(Number(b.id), b));
   const r = await createAgent(b);
   if (r.error) return Response.json({ success: false, error: r.error }, { status: 400 });

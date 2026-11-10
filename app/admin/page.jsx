@@ -29,10 +29,10 @@ html, body { height:100%; overscroll-behavior:none; }
 /* console */
 .a-root { height:100vh; height:100dvh; display:flex; background:#f6f7f9; overflow:hidden; }
 .a-side { width:320px; min-width:260px; max-width:90vw; display:flex; flex-direction:column; background:#fff; border-right:1px solid #e3e8e6; flex-shrink:0; }
-.a-side-head { background:#c23a10; color:#fff; padding:12px 14px; display:flex; align-items:center; gap:10px; }
-.a-side-head img { height:30px; width:auto; border-radius:8px; }
-.a-side-head strong { flex:1; font-size:15px; }
-.a-side-head button { background:rgba(255,255,255,.15); color:#fff; border:0; border-radius:16px; padding:6px 10px; font-size:12px; cursor:pointer; }
+.a-side-head { background:#c23a10; color:#fff; padding:12px 12px; display:flex; align-items:center; gap:7px; overflow:hidden; }
+.a-side-head img { height:26px; width:auto; border-radius:8px; flex-shrink:0; }
+.a-side-head strong { flex:1; min-width:0; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.a-side-head button { background:rgba(255,255,255,.15); color:#fff; border:0; border-radius:16px; padding:6px 9px; font-size:12px; cursor:pointer; flex-shrink:0; }
 .ag-overlay { position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:300; display:flex; align-items:center; justify-content:center; padding:16px; }
 .ag-panel { background:#fff; border-radius:14px; width:100%; max-width:400px; max-height:85vh; overflow:auto; }
 .ag-head { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid #eee; }
@@ -655,7 +655,7 @@ function Console() {
               <i className={`fas ${notifOn ? "fa-bell" : "fa-bell-slash"}`} />
             </button>
             <button onClick={refreshUsers} title="Refresh"><i className="fas fa-rotate" /></button>
-            <button onClick={logout}>Logout</button>
+            <button onClick={logout} title="Logout"><i className="fas fa-right-from-bracket" /></button>
           </div>
           <div className="a-search">
             <input placeholder="Search mobile…" value={q} onChange={(e) => setQ(e.target.value)} />
