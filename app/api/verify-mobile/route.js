@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { findUserByMobile, createUser, newSession, sendWelcome, emitToAdmins } from "@/lib/db";
-import { otpSend } from "@/lib/authx";
+import { otpSend, DEV_OTP_OK } from "@/lib/authx";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +18,8 @@ export async function POST(req) {
   // first-time users must verify via OTP before an account is created
   if (isNew && !body.skip_otp) {
     const { code, delivered } = await otpSend(`${cc}${mobile}`);
+    if (!delivered && !DEV_OTP_OK)
+      return Response.json({ success: false, error: "OTP SMS nahi ja paya — thodi der baad try karein" }, { status: 502 });
     return Response.json({ success: true, otp_required: true, delivered, dev_code: delivered ? undefined : code, cc, mobile });
   }
   if (!user) user = await createUser(mobile, body.device_id, cc);

@@ -2,3 +2,5 @@ node_modules
 .next
 data
 *.log
+.env*
+!.env*.example

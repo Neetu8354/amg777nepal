@@ -128,7 +128,7 @@ export default function VerifyPage() {
     setErr("");
     try {
       setOtpMode("wa");
-      const r = await api("/api/auth/wa/otp/send", { method: "POST", body: { mobile } });
+      const r = await api("/api/auth/wa/otp/send", { method: "POST", body: { mobile, cc } });
       if (r.data?.success) {
         setOtpSent(true);
         setResendIn(60);
