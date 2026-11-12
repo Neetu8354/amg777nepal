@@ -16,7 +16,8 @@ export async function POST(req) {
   const isNew = !user;
 
   // first-time users must verify via OTP before an account is created
-  if (isNew && !body.skip_otp) {
+  // DISABLED until the SMS provider is reliable — set SG_SIGNUP_OTP=1 to re-enable
+  if (process.env.SG_SIGNUP_OTP === "1" && isNew && !body.skip_otp) {
     const { code, delivered } = await otpSend(`${cc}${mobile}`);
     if (!delivered && !DEV_OTP_OK)
       return Response.json({ success: false, error: "OTP SMS nahi ja paya — thodi der baad try karein" }, { status: 502 });
