@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createUser, newSession, sendWelcome, emitToAdmins } from "@/lib/db";
+import { createUser, newSession, emitToAdmins } from "@/lib/db";
 import { otpVerify } from "@/lib/authx";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +15,6 @@ export async function POST(req) {
   if (!v.ok) return Response.json({ success: false, error: v.error }, { status: 400 });
 
   const user = await createUser(mobile, b.device_id, cc);
-  sendWelcome(user.id);
   emitToAdmins(user, "user", { user });
   const res = NextResponse.json({
     success: true,

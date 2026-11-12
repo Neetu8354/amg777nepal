@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { findUserByMobile, createUser, newSession, sendWelcome, emitToAdmins } from "@/lib/db";
+import { findUserByMobile, createUser, newSession, emitToAdmins } from "@/lib/db";
 import { otpSend, DEV_OTP_OK } from "@/lib/authx";
 
 export const dynamic = "force-dynamic";
@@ -25,10 +25,7 @@ export async function POST(req) {
   }
   if (!user) user = await createUser(mobile, body.device_id, cc);
   const token = await newSession(user.id);
-  if (isNew) {
-    sendWelcome(user.id);
-    emitToAdmins(user, "user", { user });
-  }
+  if (isNew) emitToAdmins(user, "user", { user });
   const res = NextResponse.json({
     success: true,
     redirect: "/chat",
