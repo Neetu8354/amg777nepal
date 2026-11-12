@@ -132,7 +132,7 @@ export default function VerifyPage() {
       if (r.data?.success) {
         setOtpSent(true);
         setResendIn(60);
-        setInfo(`WhatsApp par +91 ${mobile} pe code bheja gaya${r.data.dev_code ? ` — demo code: ${r.data.dev_code}` : ""}`);
+        setInfo(`SMS par +${cc} ${mobile} pe code bheja gaya${r.data.dev_code ? ` — demo code: ${r.data.dev_code}` : ""}`);
       } else setErr(r.data?.error || "Code nahi bhej paya");
     } catch {
       setErr("Network error");
@@ -330,7 +330,7 @@ export default function VerifyPage() {
               )}
               {cfg.waOtp && !needPw && !otpSent && (
                 <button className="v-btn" onClick={sendOtp} disabled={loading}>
-                  <i className="fab fa-whatsapp" /> {loading ? "Please wait..." : "Login with OTP"}
+                  <i className="fas fa-comment-sms" /> {loading ? "Please wait..." : "Login with OTP"}
                 </button>
               )}
               {cfg.plain && !otpSent && (
