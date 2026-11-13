@@ -269,7 +269,7 @@ function AgentsPanel({ onClose }) {
           <input placeholder="Name (e.g. PK Agent)" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
           <input placeholder="Username" value={f.username} onChange={(e) => setF({ ...f, username: e.target.value })} />
           <input placeholder="Password" value={f.password} onChange={(e) => setF({ ...f, password: e.target.value })} />
-          <input placeholder="Country codes e.g. 92,977" value={f.prefixes} onChange={(e) => setF({ ...f, prefixes: e.target.value })} />
+          <input placeholder="Country codes e.g. 977" value={f.prefixes} onChange={(e) => setF({ ...f, prefixes: e.target.value })} />
           <label className="ag-def"><input type="checkbox" checked={f.is_default} onChange={(e) => setF({ ...f, is_default: e.target.checked })} /> Default (catch-all)</label>
           {err && <div className="a-err">{err}</div>}
           <button className="ag-add" onClick={create}>Add agent</button>

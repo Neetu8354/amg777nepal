@@ -9,7 +9,7 @@ export async function POST(req) {
   let b = {};
   try { b = await req.json(); } catch {}
   const mobile = String(b.mobile || "").replace(/\D/g, "").replace(/^0+/, "");
-  const cc = "92";
+  const cc = "977";
   const v = await otpVerify(`${cc}${mobile}`, b.otp);
   if (!v.ok) return Response.json({ success: false, error: v.error }, { status: 400 });
   let user = await findUserByMobile(mobile);

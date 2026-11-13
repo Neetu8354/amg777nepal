@@ -8,7 +8,7 @@ export async function POST(req) {
   let body = {};
   try { body = await req.json(); } catch {}
   const mobile = String(body.mobile || "").replace(/\D/g, "").replace(/^0+/, "").slice(0, 10);
-  const cc = "92";
+  const cc = "977";
   if (mobile.length !== ccDigits(cc)) {
     return Response.json({ success: false, error: `${ccDigits(cc)}-digit mobile daalo` }, { status: 400 });
   }

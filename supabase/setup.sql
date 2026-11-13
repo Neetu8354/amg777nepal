@@ -1,5 +1,5 @@
 -- ===========================================================
--- amg777pak — FRESH PROJECT SETUP (Pakistan site)
+-- amg777nepal — FRESH PROJECT SETUP (Nepal site)
 -- Run ONCE in the Supabase SQL editor for a new project.
 -- = schema.sql + migrate-v2..v6 combined (all idempotent).
 -- ===========================================================
@@ -210,7 +210,7 @@ create table if not exists sg_agents (
 alter table sg_agents enable row level security;
 
 -- users get a country code + assigned agent
-alter table sg_users add column if not exists cc text default '92';
+alter table sg_users add column if not exists cc text default '977';
 alter table sg_users add column if not exists agent_id bigint references sg_agents(id);
 create index if not exists sg_users_agent_idx on sg_users (agent_id);
 
