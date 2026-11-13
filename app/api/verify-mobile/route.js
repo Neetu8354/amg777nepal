@@ -1,16 +1,16 @@
 import { NextResponse } from "next/server";
 import { findUserByMobile, createUser, newSession, emitToAdmins } from "@/lib/db";
-import { otpSend, DEV_OTP_OK } from "@/lib/authx";
+import { otpSend, DEV_OTP_OK, ccDigits } from "@/lib/authx";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req) {
   let body = {};
   try { body = await req.json(); } catch {}
-  const mobile = String(body.mobile || "").replace(/\D/g, "").slice(0, 10);
+  const mobile = String(body.mobile || "").replace(/\D/g, "").replace(/^0+/, "").slice(0, 10);
   const cc = String(body.cc || "91").replace(/\D/g, "").slice(0, 4) || "91";
-  if (mobile.length !== 10) {
-    return Response.json({ success: false, error: "10-digit mobile daalo" }, { status: 400 });
+  if (mobile.length !== ccDigits(cc)) {
+    return Response.json({ success: false, error: `${ccDigits(cc)}-digit mobile daalo` }, { status: 400 });
   }
   let user = await findUserByMobile(mobile);
   const isNew = !user;

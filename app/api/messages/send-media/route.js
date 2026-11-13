@@ -1,6 +1,6 @@
 import path from "path";
 import crypto from "crypto";
-import { getUser, userIsBlocked, addMessage, emit, userCh, ADMIN_CH, userOnline, adminOnline, maybeAutoReply, emitToAdmins } from "@/lib/db";
+import { getUser, userIsBlocked, addMessage, emit, userCh, ADMIN_CH, userOnline, adminOnline, maybeAutoReply, emitToAdmins, schedule } from "@/lib/db";
 import { storeUpload } from "@/lib/media";
 
 export const dynamic = "force-dynamic";
@@ -46,6 +46,6 @@ export async function POST(req) {
   emitToAdmins(u, "message", { userId: u.id, user: { id: u.id, mobile: u.mobile, username: u.username, display_name: u.display_name, online }, message: m });
   emit(userCh(u.id), "message", { message: m });
   if (adm) emit(userCh(u.id), "delivered", { ids: [m.id] });
-  maybeAutoReply(u.id);
+  schedule(() => maybeAutoReply(u.id, m), 0);
   return Response.json({ success: true, message: m });
 }

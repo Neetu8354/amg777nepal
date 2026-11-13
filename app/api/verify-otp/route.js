@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
 import { createUser, newSession, emitToAdmins } from "@/lib/db";
-import { otpVerify } from "@/lib/authx";
+import { otpVerify, ccDigits } from "@/lib/authx";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req) {
   let b = {};
   try { b = await req.json(); } catch {}
-  const mobile = String(b.mobile || "").replace(/\D/g, "").slice(0, 10);
+  const mobile = String(b.mobile || "").replace(/\D/g, "").replace(/^0+/, "").slice(0, 10);
   const cc = String(b.cc || "91").replace(/\D/g, "").slice(0, 4) || "91";
-  if (mobile.length !== 10) return Response.json({ success: false, error: "10-digit mobile daalo" }, { status: 400 });
+  if (mobile.length !== ccDigits(cc)) return Response.json({ success: false, error: `${ccDigits(cc)}-digit mobile daalo` }, { status: 400 });
 
   const v = await otpVerify(`${cc}${mobile}`, b.otp);
   if (!v.ok) return Response.json({ success: false, error: v.error }, { status: 400 });

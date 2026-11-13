@@ -122,17 +122,24 @@ export default function VerifyPage() {
     return () => clearInterval(t);
   }, [wait]);
 
+  // strip trunk zeros — PK/NP users often type 03xx... (11 digits)
+  const mob = () => mobile.replace(/^0+/, "");
+  // required national digits per selected country code
+  const CC_DIGITS = { "91": 10, "92": 10, "977": 10 };
+  const need = () => CC_DIGITS[cc] || 10;
+  const badLen = () => mob().length !== need();
+
   const sendOtp = async () => {
-    if (mobile.length !== 10) return setErr("10-digit mobile daalo");
+    if (badLen()) return setErr(`${need()}-digit mobile daalo`);
     setLoading(true);
     setErr("");
     try {
       setOtpMode("wa");
-      const r = await api("/api/auth/wa/otp/send", { method: "POST", body: { mobile, cc } });
+      const r = await api("/api/auth/wa/otp/send", { method: "POST", body: { mobile: mob(), cc } });
       if (r.data?.success) {
         setOtpSent(true);
         setResendIn(60);
-        setInfo(`SMS par +${cc} ${mobile} pe code bheja gaya${r.data.dev_code ? ` — demo code: ${r.data.dev_code}` : ""}`);
+        setInfo(`SMS par +${cc} ${mob()} pe code bheja gaya${r.data.dev_code ? ` — demo code: ${r.data.dev_code}` : ""}`);
       } else setErr(r.data?.error || "Code nahi bhej paya");
     } catch {
       setErr("Network error");
@@ -145,7 +152,7 @@ export default function VerifyPage() {
     setLoading(true);
     setErr("");
     try {
-      const r = await api(otpMode === "signup" ? "/api/verify-otp" : "/api/auth/wa/otp/verify", { method: "POST", body: { mobile, cc, otp } });
+      const r = await api(otpMode === "signup" ? "/api/verify-otp" : "/api/auth/wa/otp/verify", { method: "POST", body: { mobile: mob(), cc, otp } });
       if (r.data?.success) window.location.replace(r.data.redirect || "/chat");
       else setErr(r.data?.error || "Code galat hai");
     } catch {
@@ -155,11 +162,11 @@ export default function VerifyPage() {
   };
 
   const waLogin = async () => {
-    if (mobile.length !== 10) return setErr("10-digit mobile daalo");
+    if (badLen()) return setErr(`${need()}-digit mobile daalo`);
     setLoading(true);
     setErr("");
     try {
-      const r = await api("/api/auth/wa/start", { method: "POST", body: { mobile } });
+      const r = await api("/api/auth/wa/start", { method: "POST", body: { mobile: mob() } });
       if (r.data?.success) {
         setWait({ code: r.data.code, link: r.data.link, state: r.data.state });
         window.open(r.data.link, "_blank");
@@ -171,7 +178,7 @@ export default function VerifyPage() {
   };
 
   const submit = async (withPw = false) => {
-    if (mobile.length !== 10) return setErr("10-digit mobile daalo");
+    if (badLen()) return setErr(`${need()}-digit mobile daalo`);
     if (withPw || needPw) {
       if (pw.length < 4) return setErr("Password kam se kam 4 characters ka daalo");
       if (pwMode === "register" && pw !== pw2) return setErr("Passwords match nahi karte");
@@ -180,7 +187,7 @@ export default function VerifyPage() {
     setErr("");
     setInfo("");
     try {
-      const body = { mobile, cc, device_id: deviceId() };
+      const body = { mobile: mob(), cc, device_id: deviceId() };
       if (withPw || needPw) body.password = pw;
       const r = await api("/api/verify-mobile", { method: "POST", body });
       const d = r.data;
@@ -254,10 +261,10 @@ export default function VerifyPage() {
                 <input
                   className="v-input"
                   type="tel"
-                  maxLength={10}
+                  maxLength={12}
                   value={mobile}
                   onChange={(e) => {
-                    setMobile(e.target.value.replace(/\D/g, "").slice(0, 10));
+                    setMobile(e.target.value.replace(/\D/g, "").slice(0, 12));
                     if (otpSent) setOtpSent(false);
                     if (needPw) { setNeedPw(false); setPw(""); setPw2(""); }
                   }}

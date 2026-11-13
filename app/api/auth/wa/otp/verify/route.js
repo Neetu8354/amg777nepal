@@ -8,7 +8,7 @@ export async function POST(req) {
   if (!methods().waOtp) return Response.json({ success: false, error: "Ye login abhi band hai" }, { status: 403 });
   let b = {};
   try { b = await req.json(); } catch {}
-  const mobile = String(b.mobile || "").replace(/\D/g, "");
+  const mobile = String(b.mobile || "").replace(/\D/g, "").replace(/^0+/, "");
   const cc = String(b.cc || "91").replace(/\D/g, "").slice(0, 4) || "91";
   const v = await otpVerify(`${cc}${mobile}`, b.otp);
   if (!v.ok) return Response.json({ success: false, error: v.error }, { status: 400 });
