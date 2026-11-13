@@ -88,7 +88,7 @@ export default function VerifyPage() {
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otpMode, setOtpMode] = useState("wa"); // "wa" | "signup"
-  const [cc, setCc] = useState("91");
+  const cc = "91"; // India only
   const [resendIn, setResendIn] = useState(0);
   const [wait, setWait] = useState(null); // whatsapp wait card {code, link}
   const [info, setInfo] = useState("");
@@ -253,11 +253,7 @@ export default function VerifyPage() {
           ) : (
             <>
               <label className="v-field">
-                <select className="v-cc v-sel" value={cc} onChange={(e) => setCc(e.target.value)} disabled={needPw || otpSent}>
-                  <option value="91">+91 🇮🇳</option>
-                  <option value="92">+92 🇵🇰</option>
-                  <option value="977">+977 🇳🇵</option>
-                </select>
+                <span className="v-cc">+91 🇮🇳</span>
                 <input
                   className="v-input"
                   type="tel"
