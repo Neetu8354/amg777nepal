@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 200">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffb23d"/>
+      <stop offset="1" stop-color="#ff4d00"/>
+    </linearGradient>
+  </defs>
+  <text x="320" y="145" text-anchor="middle"
+        font-family="'Arial Black','Segoe UI',Arial,sans-serif"
+        font-size="118" font-weight="900" font-style="italic" letter-spacing="-2">
+    <tspan fill="#ffffff">amg</tspan><tspan fill="url(#g)">777</tspan>
+  </text>
+</svg>

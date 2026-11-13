@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 const APP_NAME = "amg777";
-const ICON = "/app/icon-192.png?v=3";
+const ICON = "/app/icon-192.png?v=4";
 
 const IA_CSS = `
 .ia-card { background:#fff; color:#111; display:flex; align-items:center; gap:12px; padding:12px 12px 12px 14px;

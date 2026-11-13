@@ -24,18 +24,6 @@ const CSS = `
   .s-txt b { font-size:15.5px; font-weight:700; }
   .s-txt small { font-size:12.5px; color:#8f979e; font-weight:400; }
   .s-chev { color:#5c646b; font-size:13px; }
-  .s-apk { width:100%; max-width:400px; margin-top:26px; }
-  .s-apkbtn { display:flex; align-items:center; justify-content:center; gap:13px; padding:15px 20px; border-radius:16px;
-    background:linear-gradient(135deg,#ffb300,#ff5e00); color:#fff; text-decoration:none;
-    box-shadow:0 10px 30px rgba(255,110,0,0.35), inset 0 1px 0 rgba(255,255,255,0.28);
-    transition:transform .15s, box-shadow .15s; }
-  .s-apkbtn:hover { transform:translateY(-2px); box-shadow:0 14px 38px rgba(255,110,0,0.45), inset 0 1px 0 rgba(255,255,255,0.28); }
-  .s-apkbtn:active { transform:translateY(0) scale(.98); }
-  .s-apkbtn .ai { width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.20);
-    display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
-  .s-apkbtn .at { display:flex; flex-direction:column; align-items:center; line-height:1.25; }
-  .s-apkbtn .at b { font-size:16.5px; font-weight:800; }
-  .s-apkbtn .at small { font-size:10.5px; letter-spacing:1.6px; opacity:.88; font-weight:700; }
   .s-foot { margin-top:28px; padding-top:18px; width:100%; max-width:400px; text-align:center;
     border-top:1px solid rgba(255,255,255,0.07); color:#6b7178; font-size:11.5px; }
 `;
@@ -45,7 +33,7 @@ export default function SocialPage() {
     <>
       <style>{CSS}</style>
       <div className="s-page">
-        <img className="s-logo" src="/app/amg777-logo.png" alt="amg777" />
+        <img className="s-logo" src="/app/amg777-logo.svg" alt="amg777" />
         <h1 className="s-title">amg777 Customer Support</h1>
         <p className="s-sub">Follow us &amp; stay connected</p>
         <div className="s-links">
@@ -68,12 +56,6 @@ export default function SocialPage() {
             <span className="s-ico"><i className="fas fa-globe" /></span>
             <span className="s-txt"><b>Website</b><small>Visit our official website</small></span>
             <i className="fas fa-chevron-right s-chev" />
-          </a>
-        </div>
-        <div className="s-apk">
-          <a className="s-apkbtn" href="/amg777.apk" download>
-            <span className="ai"><i className="fas fa-download" /></span>
-            <span className="at"><b>Download APK</b><small>GET THE MOBILE APP</small></span>
           </a>
         </div>
         <p className="s-foot">amg777 Customer Support · Secure · 24/7</p>

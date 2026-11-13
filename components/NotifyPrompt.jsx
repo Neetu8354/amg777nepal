@@ -95,7 +95,7 @@ export default function NotifyPrompt({ enabled, name = "amg777 Support" }) {
       <div className="ng-back" role="dialog" aria-modal="true" aria-labelledby="ng-title">
         <div className="ng-card">
           <div className="ng-hero">
-            <img className="ng-mark" src="/app/icon-192.png?v=3" alt="" aria-hidden="true" />
+            <img className="ng-mark" src="/app/icon-192.png?v=4" alt="" aria-hidden="true" />
             <span className="ng-badge" aria-hidden="true">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="#ff5a2e">
                 <path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4a1.5 1.5 0 0 0-3 0v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />

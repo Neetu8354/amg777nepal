@@ -231,7 +231,7 @@ function Login({ onOk }) {
             go();
           }}
         >
-          <img src="/app/icon-192.png?v=3" alt="" />
+          <img src="/app/icon-192.png?v=4" alt="" />
           <h1>Admin Login</h1>
           <p>amg777 Customer Support — agent console</p>
           {err && <div className="a-err">{err}</div>}
@@ -649,7 +649,7 @@ function Console() {
         <aside className={`a-side ${mobileOpen ? "hidden" : ""}`}>
           <div className="a-side-head">
             {role === "main" && <button onClick={() => setAgentsOpen(true)} title="Agents"><i className="fas fa-users-gear" /></button>}
-            <img src="/app/amg777-logo.png" alt="" />
+            <img src="/app/amg777-logo.svg" alt="" />
             <strong>amg777 Admin</strong>
             <button onClick={enableNotifs} title={notifOn ? "Call alerts on" : "Enable call alerts"} style={notifOn ? { color: "#25d366" } : undefined}>
               <i className={`fas ${notifOn ? "fa-bell" : "fa-bell-slash"}`} />
