@@ -16,7 +16,7 @@ Open http://localhost:3000
 
 | Area | Details |
 |---|---|
-| **Login** (`/verify`) | Dark/gold card, +91 mobile login (10-digit). Creates/finds the user and drops you into chat. Method buttons (WhatsApp OTP, WhatsApp link, Telegram, password) render only when enabled via `/api/auth/methods`. |
+| **Login** (`/verify`) | Dark/gold card, +92 mobile login (10-digit). Creates/finds the user and drops you into chat. Method buttons (WhatsApp OTP, WhatsApp link, Telegram, password) render only when enabled via `/api/auth/methods`. |
 | **Chat** (`/chat`) | WhatsApp-style UI: green header, avatar, online/typing/last-seen status, date dividers, bubble tails, ✓/✓✓ + blue read ticks, reply quotes, edit marks, link previews, emoji picker, sticker picker, image/video upload (≤5MB/≤50MB) with caption preview + progress bar, voice messages, message context sheet (Reply/Copy/Edit/Delete), toasts, block bar. |
 | **Calls** | Real WebRTC voice calls between customer and agent (signaling over SSE + REST). Ringing/connecting/connected states, call timer, mute, hold, remote-mute/hold notes, decline, timeout → missed, full-screen overlay + draggable mini card, call history rows in the timeline. |
 | **Real-time** | Server-Sent Events (`/api/chat/events`, `/api/admin/events`): messages, delivered/read receipts, typing, presence, block, edit, delete, call signaling. |
