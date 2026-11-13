@@ -40,7 +40,7 @@ function permState() {
   return "default";
 }
 
-export default function NotifyPrompt({ enabled, name = "Sprinter Support" }) {
+export default function NotifyPrompt({ enabled, name = "amg777 Support" }) {
   const [perm, setPerm] = useState("default");
   const [busy, setBusy] = useState(false);
   const [fine, setFine] = useState("");

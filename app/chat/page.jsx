@@ -165,8 +165,8 @@ html, body { height:100%; overscroll-behavior:none; }
 `;
 
 const SUPPORT_FALLBACK = {
-  display_name: "Billy777 Customer Support",
-  avatar_url: avatarFor("billy777_support"),
+  display_name: "amg777 Customer Support",
+  avatar_url: avatarFor("amg777_support"),
 };
 
 export default function ChatPage() {
@@ -644,7 +644,7 @@ export default function ChatPage() {
             <i className="fas fa-arrow-left" />
           </a>
           <div className="wa-avatar-wrap">
-            <img className="wa-avatar" src={support?.avatar_url || avatarFor("billy777_support")} alt={title} />
+            <img className="wa-avatar" src={support?.avatar_url || avatarFor("amg777_support")} alt={title} />
           </div>
           <div className="wa-info">
             <div className="wa-name">{title}</div>

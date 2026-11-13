@@ -233,7 +233,7 @@ function Login({ onOk }) {
         >
           <img src="/app/icon-192.png?v=3" alt="" />
           <h1>Admin Login</h1>
-          <p>Billy777 Customer Support — agent console</p>
+          <p>amg777 Customer Support — agent console</p>
           {err && <div className="a-err">{err}</div>}
           <input placeholder="Username" value={u} onChange={(e) => setU(e.target.value)} autoComplete="username" />
           <input placeholder="Password" type="password" value={p} onChange={(e) => setP(e.target.value)} autoComplete="current-password" />
@@ -649,8 +649,8 @@ function Console() {
         <aside className={`a-side ${mobileOpen ? "hidden" : ""}`}>
           <div className="a-side-head">
             {role === "main" && <button onClick={() => setAgentsOpen(true)} title="Agents"><i className="fas fa-users-gear" /></button>}
-            <img src="/app/billy-logo.png" alt="" />
-            <strong>Billy777 Admin</strong>
+            <img src="/app/amg777-logo.png" alt="" />
+            <strong>amg777 Admin</strong>
             <button onClick={enableNotifs} title={notifOn ? "Call alerts on" : "Enable call alerts"} style={notifOn ? { color: "#25d366" } : undefined}>
               <i className={`fas ${notifOn ? "fa-bell" : "fa-bell-slash"}`} />
             </button>

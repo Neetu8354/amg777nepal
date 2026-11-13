@@ -4,7 +4,7 @@
 -- = schema.sql + migrate-v2..v6 combined (all idempotent).
 -- ===========================================================
 
--- Billy777 Customer Support — Supabase schema (serverless-ready)
+-- amg777 Customer Support — Supabase schema (serverless-ready)
 -- Run once in the Supabase SQL editor. Service-role key bypasses RLS, so
 -- simple deny-all policies are fine for a server-only backend.
 

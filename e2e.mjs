@@ -1,4 +1,4 @@
-// E2E test for Sprinter Customer Care — run with dev server on :3000
+// E2E test for amg777 Customer Support — run with dev server on :3000
 const B = "http://localhost:3000";
 const results = [];
 const ok = (n, c, x = "") => { results.push([c, n, x]); console.log(`${c ? "PASS" : "FAIL"}  ${n}${x ? "  — " + x : ""}`); };
@@ -125,7 +125,7 @@ r = await api("/api/track/visit", { method: "POST", body: { path: "/verify", ref
 r = await api("/api/track/geo", { method: "POST", body: { lat: 13.0, lon: 80.2 } }); ok("track/geo", r.json?.ok === true);
 
 // ---------- 12. Admin console ----------
-r = await api("/api/admin/login", { method: "POST", body: { username: "admin", password: "sprinter123" } });
+r = await api("/api/admin/login", { method: "POST", body: { username: "admin", password: "amg777" } });
 const adminCookie = r.setc;
 ok("admin/login", r.json?.success && adminCookie.includes("sg_admin"), `role=${r.json?.role}`);
 r = await api("/api/admin/me", { cookie: adminCookie });

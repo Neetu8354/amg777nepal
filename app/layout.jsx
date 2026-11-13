@@ -2,14 +2,14 @@ import "./globals.css";
 import SwRegister from "@/components/SwRegister";
 
 export const metadata = {
-  title: "Billy777 Customer Support",
+  title: "amg777 Customer Support",
   description: "24x7 live support chat",
-  applicationName: "billy777",
+  applicationName: "amg777",
   manifest: "/manifest.json",
   formatDetection: { telephone: false },
   appleWebApp: {
     capable: true,
-    title: "billy777",
+    title: "amg777",
     statusBarStyle: "default",
   },
   icons: {

@@ -1,6 +1,6 @@
-# Sprinter Customer Care
+# amg777 Customer Support
 
-A fully functional recreation of the Sprinter Customer Care app — a WhatsApp-style
+A WhatsApp-style
 24x7 live support chat as an installable PWA, built with Next.js + React.
 
 ## Run it
@@ -20,7 +20,7 @@ Open http://localhost:3000
 | **Chat** (`/chat`) | WhatsApp-style UI: green header, avatar, online/typing/last-seen status, date dividers, bubble tails, ✓/✓✓ + blue read ticks, reply quotes, edit marks, link previews, emoji picker, sticker picker, image/video upload (≤5MB/≤50MB) with caption preview + progress bar, voice messages, message context sheet (Reply/Copy/Edit/Delete), toasts, block bar. |
 | **Calls** | Real WebRTC voice calls between customer and agent (signaling over SSE + REST). Ringing/connecting/connected states, call timer, mute, hold, remote-mute/hold notes, decline, timeout → missed, full-screen overlay + draggable mini card, call history rows in the timeline. |
 | **Real-time** | Server-Sent Events (`/api/chat/events`, `/api/admin/events`): messages, delivered/read receipts, typing, presence, block, edit, delete, call signaling. |
-| **Admin console** (`/admin`) | Agent login, customer list (online dot, unread badge, last message, search), conversation pane (reply, image attach, typing indicator, block/unblock, delete), initiate/answer calls. Default login: `admin` / `sprinter123` (change via `SG_ADMIN_USER` / `SG_ADMIN_PASS`). |
+| **Admin console** (`/admin`) | Agent login, customer list (online dot, unread badge, last message, search), conversation pane (reply, image attach, typing indicator, block/unblock, delete), initiate/answer calls. Default login: `admin` / `amg777` (change via `SG_ADMIN_USER` / `SG_ADMIN_PASS`). |
 | **PWA** | `manifest.json`, service worker (image caching, offline retry page, push notifications), install banner with per-platform install guide (iOS/Android/Mac/desktop) + install progress overlay. |
 | **Notifications** | Web-push (VAPID) — subscribe from the in-app prompt; replies push to the user's device even when the tab is closed. |
 | **Bot fallback** | When no agent is connected, an auto-reply bot answers (set `SG_AUTOREPLY=0` to disable). |
@@ -52,7 +52,7 @@ Same `/api/auth/methods` flags as the live site — off by default, enable via e
 | `SG_AUTH_WAOTP=1` | "Login with OTP" — sends a 6-digit code (returned as `dev_code` for demo) |
 | `SG_AUTH_WAMSG=1` | "Login with WhatsApp" — code + wa.me link; the page polls `/api/auth/wa/status` and logs in automatically |
 | `SG_AUTH_TELEGRAM=1` | Telegram button (stub — needs a real bot token) |
-| `SG_ADMIN_USER` / `SG_ADMIN_PASS` | admin console credentials (default `admin` / `sprinter123`) |
+| `SG_ADMIN_USER` / `SG_ADMIN_PASS` | admin console credentials (default `admin` / `amg777`) |
 | `SG_AUTOREPLY=0` | disable the fallback bot |
 
 ## Supabase (optional)
@@ -77,7 +77,7 @@ live events between instances, `sg_presence`/`sg_calls` replace in-memory maps,
 and uploads go to the `sg-media` Storage bucket.
 
 1. Run `supabase/migrate-v2.sql` in the Supabase SQL editor (once).
-2. Push the `sprinter-app` folder to a Git repo → import in Vercel.
+2. Push the `amg777-app` folder to a Git repo → import in Vercel.
 3. Vercel env vars: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
    (optional: `SG_ADMIN_USER`, `SG_ADMIN_PASS`, `SG_AUTOREPLY=0`, auth flags).
 4. Deploy. SSE reconnects automatically if a stream hits the function limit.
