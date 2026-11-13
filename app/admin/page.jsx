@@ -231,7 +231,7 @@ function Login({ onOk }) {
             go();
           }}
         >
-          <img src="/app/icon-192.png?v=2" alt="" />
+          <img src="/app/icon-192.png?v=3" alt="" />
           <h1>Admin Login</h1>
           <p>Billy777 Customer Support — agent console</p>
           {err && <div className="a-err">{err}</div>}

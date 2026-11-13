@@ -38,7 +38,7 @@ button{background:#25d366;color:#fff;border:0;border-radius:22px;padding:12px 28
 self.addEventListener("install", (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE);
-    await cache.addAll(["/app/icon-192.png?v=2"]).catch(() => {});
+    await cache.addAll(["/app/icon-192.png?v=3"]).catch(() => {});
     await self.skipWaiting();
   })());
 });
@@ -113,7 +113,7 @@ self.addEventListener("push", (event) => {
   try { data = event.data ? event.data.json() : {}; } catch { data = { body: event.data ? event.data.text() : "" }; }
   const title = data.title || "Support";
   const body = String(data.body || "New message").slice(0, 180);
-  const icon = data.icon || "/app/icon-192.png?v=2";
+  const icon = data.icon || "/app/icon-192.png?v=3";
   event.waitUntil(
     self.registration.showNotification(title, {
       body,
