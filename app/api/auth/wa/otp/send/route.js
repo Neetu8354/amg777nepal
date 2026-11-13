@@ -7,7 +7,7 @@ export async function POST(req) {
   let b = {};
   try { b = await req.json(); } catch {}
   const mobile = String(b.mobile || "").replace(/\D/g, "").replace(/^0+/, "");
-  const cc = String(b.cc || "91").replace(/\D/g, "").slice(0, 4) || "91";
+  const cc = "91";
   if (mobile.length !== ccDigits(cc)) return Response.json({ success: false, error: `${ccDigits(cc)}-digit mobile daalo` }, { status: 400 });
   const { code, delivered } = await otpSend(`${cc}${mobile}`);
   if (!delivered && !DEV_OTP_OK)

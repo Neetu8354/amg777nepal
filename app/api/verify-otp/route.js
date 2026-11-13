@@ -8,7 +8,7 @@ export async function POST(req) {
   let b = {};
   try { b = await req.json(); } catch {}
   const mobile = String(b.mobile || "").replace(/\D/g, "").replace(/^0+/, "").slice(0, 10);
-  const cc = String(b.cc || "91").replace(/\D/g, "").slice(0, 4) || "91";
+  const cc = "91";
   if (mobile.length !== ccDigits(cc)) return Response.json({ success: false, error: `${ccDigits(cc)}-digit mobile daalo` }, { status: 400 });
 
   const v = await otpVerify(`${cc}${mobile}`, b.otp);
